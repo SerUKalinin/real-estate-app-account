@@ -2,6 +2,7 @@ package com.example.real_estate_app_account.service;
 
 import com.example.real_estate_app_account.dto.FloorRequest;
 import com.example.real_estate_app_account.dto.FloorResponse;
+import com.example.real_estate_app_account.mapper.FloorMapper;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.model.Floor;
@@ -23,6 +24,8 @@ public class FloorService {
     private final FloorRepository floorRepository;
     private final BuildingRepository buildingRepository;
     private final EntranceRepository entranceRepository;
+    private final FloorMapper floorMapper;
+
 
     /**
      * Создание нового этажа.
@@ -46,19 +49,17 @@ public class FloorService {
             });
 
         if (floorRepository.existsByBuildingAndEntranceAndFloorNumber(building, entrance, request.getFloorNumber())) {
-            log.error("Этаж с номером {} в здании с ID {} и подъезде с ID {} уже существует",
-                request.getFloorNumber(), request.getBuildingId(), request.getEntranceId());
-            throw new IllegalArgumentException("Этаж с таким номером уже существует в этом здании и подъезде");
+            log.error("Этаж с номером {} уже существует", request.getFloorNumber());
+            throw new IllegalArgumentException("Этаж с таким номером уже существует");
         }
 
-        Floor floor = new Floor();
-        floor.setFloorNumber(request.getFloorNumber());
+        Floor floor = floorMapper.toEntity(request);
         floor.setBuilding(building);
         floor.setEntrance(entrance);
 
         Floor savedFloor = floorRepository.save(floor);
         log.info("Этаж с ID {} успешно создан", savedFloor.getId());
-        return mapToResponse(savedFloor);
+        return floorMapper.toResponse(savedFloor);
     }
 
     /**
@@ -68,14 +69,10 @@ public class FloorService {
      */
     public List<FloorResponse> getAllFloors() {
         log.info("Запрос всех этажей");
-
-        List<FloorResponse> floors = floorRepository.findAll()
+        return floorRepository.findAll()
             .stream()
-            .map(this::mapToResponse)
+            .map(floorMapper::toResponse)
             .collect(Collectors.toList());
-
-        log.info("Найдено {} этажей", floors.size());
-        return floors;
     }
 
     /**
@@ -87,15 +84,12 @@ public class FloorService {
      */
     public FloorResponse getFloorById(Long id) {
         log.info("Запрос этажа с ID: {}", id);
-
         Floor floor = floorRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Этаж с ID {} не найден", id);
                 return new IllegalArgumentException("Этаж с ID " + id + " не найден");
             });
-
-        log.info("Этаж с ID {} найден", id);
-        return mapToResponse(floor);
+        return floorMapper.toResponse(floor);
     }
 
     /**
@@ -128,9 +122,8 @@ public class FloorService {
             });
 
         if (floorRepository.existsByBuildingAndEntranceAndFloorNumber(building, entrance, request.getFloorNumber())) {
-            log.error("Этаж с номером {} в здании с ID {} и подъезде с ID {} уже существует",
-                request.getFloorNumber(), request.getBuildingId(), request.getEntranceId());
-            throw new IllegalArgumentException("Этаж с таким номером уже существует в этом здании и подъезде");
+            log.error("Этаж с номером {} уже существует", request.getFloorNumber());
+            throw new IllegalArgumentException("Этаж с таким номером уже существует");
         }
 
         floor.setFloorNumber(request.getFloorNumber());
@@ -139,8 +132,9 @@ public class FloorService {
 
         Floor updatedFloor = floorRepository.save(floor);
         log.info("Этаж с ID {} успешно обновлён", updatedFloor.getId());
-        return mapToResponse(updatedFloor);
+        return floorMapper.toResponse(updatedFloor);
     }
+
 
     /**
      * Удаление этажа по его ID.
@@ -150,31 +144,12 @@ public class FloorService {
      */
     public void deleteFloor(Long id) {
         log.info("Попытка удалить этаж с ID: {}", id);
-
         Floor floor = floorRepository.findById(id)
             .orElseThrow(() -> {
                 log.error("Этаж с ID {} не найден", id);
                 return new IllegalArgumentException("Этаж с ID " + id + " не найден");
             });
-
         floorRepository.delete(floor);
         log.info("Этаж с ID {} успешно удалён", id);
-    }
-
-    /**
-     * Преобразование сущности этажа в ответ.
-     *
-     * @param floor Сущность этажа.
-     * @return DTO для ответа с данными этажа.
-     */
-    private FloorResponse mapToResponse(Floor floor) {
-        FloorResponse response = new FloorResponse();
-        response.setId(floor.getId());
-        response.setFloorNumber(floor.getFloorNumber());
-        response.setBuildingId(floor.getBuilding().getId());
-        response.setBuildingName(floor.getBuilding().getName());
-        response.setEntranceId(floor.getEntrance().getId());
-        response.setEntranceName(floor.getEntrance().getEntranceName());
-        return response;
     }
 }

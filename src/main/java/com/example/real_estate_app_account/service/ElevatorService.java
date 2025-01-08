@@ -4,6 +4,7 @@ import com.example.real_estate_app_account.dto.ElevatorRequest;
 import com.example.real_estate_app_account.dto.ElevatorResponse;
 import com.example.real_estate_app_account.exception.EntranceNotFoundException;
 import com.example.real_estate_app_account.exception.ElevatorNotFoundException;
+import com.example.real_estate_app_account.mapper.ElevatorMapper;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.model.Elevator;
@@ -23,6 +24,8 @@ public class ElevatorService {
 
     private final ElevatorRepository elevatorRepository;
     private final EntranceRepository entranceRepository;
+    private final ElevatorMapper elevatorMapper;
+
 
     /**
      * Создание нового лифта.
@@ -39,22 +42,12 @@ public class ElevatorService {
                 return new EntranceNotFoundException("Подъезд с ID " + request.getEntranceId() + " не найден");
             });
 
-        // Получение здания через подъезд
-        Building building = entrance.getBuilding();
-        if (building == null) {
-            log.error("Подъезд с ID {} не привязан к зданию", request.getEntranceId());
-            throw new RuntimeException("Подъезд с ID " + request.getEntranceId() + " не привязан к зданию");
-        }
-
-        Elevator elevator = new Elevator();
-        elevator.setName(request.getName());
+        Elevator elevator = elevatorMapper.toEntity(request);
         elevator.setEntrance(entrance);
-        elevator.setFloor(request.getFloor());
-        elevator.setBuilding(building);
 
         Elevator savedElevator = elevatorRepository.save(elevator);
         log.info("Лифт с ID {} успешно создан", savedElevator.getId());
-        return mapToResponse(savedElevator);
+        return elevatorMapper.toResponse(savedElevator);
     }
 
     /**
@@ -67,7 +60,7 @@ public class ElevatorService {
 
         List<ElevatorResponse> responses = elevatorRepository.findAll()
             .stream()
-            .map(this::mapToResponse)
+            .map(elevatorMapper::toResponse)
             .collect(Collectors.toList());
 
         log.info("Найдено {} лифтов", responses.size());
@@ -91,7 +84,7 @@ public class ElevatorService {
             });
 
         log.info("Лифт с ID {} найден", id);
-        return mapToResponse(elevator);
+        return elevatorMapper.toResponse(elevator);
     }
 
     /**
@@ -123,7 +116,7 @@ public class ElevatorService {
 
         Elevator updatedElevator = elevatorRepository.save(elevator);
         log.info("Лифт с ID {} успешно обновлён", updatedElevator.getId());
-        return mapToResponse(updatedElevator);
+        return elevatorMapper.toResponse(updatedElevator);
     }
 
     /**
@@ -143,20 +136,5 @@ public class ElevatorService {
 
         elevatorRepository.delete(elevator);
         log.info("Лифт с ID {} успешно удалён", id);
-    }
-
-    /**
-     * Преобразование сущности лифта в ответ.
-     *
-     * @param elevator Сущность лифта.
-     * @return DTO для ответа с данными лифта.
-     */
-    private ElevatorResponse mapToResponse(Elevator elevator) {
-        ElevatorResponse response = new ElevatorResponse();
-        response.setId(elevator.getId());
-        response.setName(elevator.getName());
-        response.setEntranceId(elevator.getEntrance().getId());
-        response.setFloor(elevator.getFloor());
-        return response;
     }
 }
