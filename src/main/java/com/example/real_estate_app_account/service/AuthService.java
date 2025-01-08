@@ -4,7 +4,7 @@ import com.example.real_estate_app_account.dto.AuthResponse;
 import com.example.real_estate_app_account.dto.LoginRequest;
 import com.example.real_estate_app_account.dto.RegisterRequest;
 import com.example.real_estate_app_account.entity.Role;
-import com.example.real_estate_app_account.entity.User;
+import com.example.real_estate_app_account.model.User;
 import com.example.real_estate_app_account.repository.UserRepository;
 import com.example.real_estate_app_account.service.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;

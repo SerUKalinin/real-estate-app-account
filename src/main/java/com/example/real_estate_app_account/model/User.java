@@ -1,5 +1,6 @@
-package com.example.real_estate_app_account.entity;
+package com.example.real_estate_app_account.model;
 
+import com.example.real_estate_app_account.entity.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
