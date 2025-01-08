@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Использует Spring Data JPA для выполнения операций с базой данных.
  */
 public interface AddressRepository extends JpaRepository<Address, Long> {
+    boolean existsByStreetAndNumberHouseAndCity(String street, String numberHouse, String city);
+    Address findByStreetAndNumberHouseAndCity(String street, String numberHouse, String city);
 }
