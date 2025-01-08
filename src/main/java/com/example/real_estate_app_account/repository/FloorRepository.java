@@ -1,5 +1,7 @@
 package com.example.real_estate_app_account.repository;
 
+import com.example.real_estate_app_account.model.Building;
+import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.model.Floor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -8,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Использует Spring Data JPA для выполнения операций с базой данных.
  */
 public interface FloorRepository extends JpaRepository<Floor, Long> {
+    boolean existsByBuildingAndEntranceAndFloorNumber(Building building, Entrance entrance, int floorNumber);
 }

@@ -23,6 +23,13 @@ public class BuildingService {
      * @return Сохранённое здание.
      */
     public Building createBuilding(Building building) {
+        log.info("Попытка создания здания с названием: {}", building.getName());
+
+        if (buildingRepository.existsByName(building.getName())) {
+            log.error("Здание с названием {} уже существует", building.getName());
+            throw new IllegalArgumentException("Здание с таким названием уже существует");
+        }
+
         log.info("Сохранение нового здания: {}", building);
         return buildingRepository.save(building);
     }
