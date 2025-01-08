@@ -1,5 +1,6 @@
 package com.example.real_estate_app_account.controller;
 
+import com.example.real_estate_app_account.dto.BuildingResponse;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.service.BuildingService;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST-контроллер для управления объектами недвижимости (зданиями).
- * Предоставляет API для создания, получения и удаления зданий.
- */
 @RestController
 @RequestMapping("/api/buildings")
 @RequiredArgsConstructor
@@ -24,48 +21,51 @@ public class BuildingController {
     /**
      * Создание нового здания.
      *
-     * @param building DTO с данными нового здания.
-     * @return ResponseEntity с созданным объектом здания и статусом 201 CREATED.
+     * @param building Данные здания.
+     * @return Ответ с созданным зданием.
      */
     @PostMapping
-    public ResponseEntity<Building> createBuilding(@RequestBody Building building) {
+    public ResponseEntity<BuildingResponse> createBuilding(@RequestBody Building building) {
         log.info("Попытка создания нового здания.");
-        return ResponseEntity.status(201).body(buildingService.createBuilding(building));
+        BuildingResponse buildingResponse = buildingService.createBuilding(building);
+        return ResponseEntity.status(201).body(buildingResponse);  // Возвращаем статус 201 с созданным зданием
     }
 
     /**
      * Получение списка всех зданий.
      *
-     * @return ResponseEntity со списком всех зданий и статусом 200 OK.
+     * @return Список зданий.
      */
     @GetMapping
-    public ResponseEntity<List<Building>> getAllBuildings() {
+    public ResponseEntity<List<BuildingResponse>> getAllBuildings() {
         log.info("Запрос списка всех зданий.");
-        return ResponseEntity.ok(buildingService.getAllBuildings());
+        List<BuildingResponse> buildings = buildingService.getAllBuildings();
+        return ResponseEntity.ok(buildings);  // Возвращаем список зданий с кодом 200
     }
 
     /**
      * Получение здания по его ID.
      *
      * @param id ID здания.
-     * @return ResponseEntity с объектом здания или статусом 404 NOT FOUND, если здание не найдено.
+     * @return Ответ с найденным зданием.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Building> getBuildingById(@PathVariable Long id) {
+    public ResponseEntity<BuildingResponse> getBuildingById(@PathVariable Long id) {
         log.info("Запрос здания с ID: {}", id);
-        return ResponseEntity.ok(buildingService.findBuildingById(id));
+        BuildingResponse buildingResponse = buildingService.findBuildingById(id);
+        return ResponseEntity.ok(buildingResponse);  // Возвращаем здание с кодом 200
     }
 
     /**
-     * Удаление здания по его ID.
+     * Удаление здания по ID.
      *
      * @param id ID здания.
-     * @return ResponseEntity со статусом 204 NO CONTENT.
+     * @return Ответ без содержимого (204).
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBuilding(@PathVariable Long id) {
         log.info("Попытка удаления здания с ID: {}", id);
         buildingService.deleteBuilding(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();  // Возвращаем статус 204 без содержимого
     }
 }
