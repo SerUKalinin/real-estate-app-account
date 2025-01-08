@@ -5,6 +5,7 @@ import com.example.real_estate_app_account.dto.EntranceResponse;
 import com.example.real_estate_app_account.exception.BuildingNotFoundException;
 import com.example.real_estate_app_account.exception.EntranceAlreadyExistsException;
 import com.example.real_estate_app_account.exception.EntranceNotFoundException;
+import com.example.real_estate_app_account.mapper.EntranceMapper;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.repository.BuildingRepository;
@@ -23,6 +24,8 @@ public class EntranceService {
 
     private final EntranceRepository entranceRepository;
     private final BuildingRepository buildingRepository;
+    private final EntranceMapper entranceMapper;
+
 
     /**
      * Создание нового подъезда.
@@ -50,7 +53,7 @@ public class EntranceService {
 
         Entrance savedEntrance = entranceRepository.save(entrance);
         log.info("Подъезд с ID {} успешно создан", savedEntrance.getId());
-        return mapToResponse(savedEntrance);
+        return entranceMapper.toEntranceResponse(savedEntrance);
     }
 
     /**
@@ -60,14 +63,10 @@ public class EntranceService {
      */
     public List<EntranceResponse> getAllEntrances() {
         log.info("Запрос списка всех подъездов");
-
-        List<EntranceResponse> responses = entranceRepository.findAll()
+        return entranceRepository.findAll()
             .stream()
-            .map(this::mapToResponse)
+            .map(entranceMapper::toEntranceResponse)
             .collect(Collectors.toList());
-
-        log.info("Найдено {} подъездов", responses.size());
-        return responses;
     }
 
     /**
@@ -87,7 +86,7 @@ public class EntranceService {
             });
 
         log.info("Подъезд с ID {} найден", id);
-        return mapToResponse(entrance);
+        return entranceMapper.toEntranceResponse(entrance);
     }
 
     /**
@@ -123,7 +122,7 @@ public class EntranceService {
 
         Entrance updatedEntrance = entranceRepository.save(entrance);
         log.info("Подъезд с ID {} успешно обновлён", updatedEntrance.getId());
-        return mapToResponse(updatedEntrance);
+        return entranceMapper.toEntranceResponse(updatedEntrance);
     }
 
     /**
@@ -143,20 +142,5 @@ public class EntranceService {
 
         entranceRepository.delete(entrance);
         log.info("Подъезд с ID {} успешно удалён", id);
-    }
-
-    /**
-     * Преобразование сущности подъезда в ответ.
-     *
-     * @param entrance Сущность подъезда.
-     * @return DTO для ответа с данными подъезда.
-     */
-    private EntranceResponse mapToResponse(Entrance entrance) {
-        EntranceResponse response = new EntranceResponse();
-        response.setId(entrance.getId());
-        response.setEntranceName(entrance.getEntranceName());
-        response.setBuildingId(entrance.getBuilding().getId());
-        response.setBuildingName(entrance.getBuilding().getName());
-        return response;
     }
 }

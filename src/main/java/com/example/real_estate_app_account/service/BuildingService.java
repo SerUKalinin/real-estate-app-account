@@ -33,24 +33,22 @@ public class BuildingService {
     public BuildingResponse createBuilding(Building building) {
         log.info("Попытка создания здания с названием: {}", building.getName());
 
-        // Проверка на существование здания с таким названием
         if (buildingRepository.existsByName(building.getName())) {
             log.error("Здание с названием {} уже существует", building.getName());
             throw new IllegalArgumentException("Здание с таким названием уже существует");
         }
 
-        // Проверка существования адреса
         if (addressRepository.existsByStreetAndNumberHouseAndCity(building.getAddress().getStreet(),
             building.getAddress().getNumberHouse(), building.getAddress().getCity())) {
             log.info("Адрес {} уже существует. Используем существующий.", building.getAddress());
             Address existingAddress = addressRepository.findByStreetAndNumberHouseAndCity(
                 building.getAddress().getStreet(), building.getAddress().getNumberHouse(), building.getAddress().getCity());
-            building.setAddress(existingAddress);  // Привязываем существующий адрес
+            building.setAddress(existingAddress);
         }
 
         log.info("Сохранение нового здания: {}", building);
         Building savedBuilding = buildingRepository.save(building);
-        return buildingMapper.toBuildingResponse(savedBuilding);  // Используем маппер
+        return buildingMapper.toBuildingResponse(savedBuilding);
     }
 
     /**
@@ -62,7 +60,7 @@ public class BuildingService {
         log.info("Получение списка всех зданий.");
         return buildingRepository.findAll()
             .stream()
-            .map(buildingMapper::toBuildingResponse)  // Преобразуем каждое здание в DTO
+            .map(buildingMapper::toBuildingResponse)
             .collect(Collectors.toList());
     }
 
@@ -79,7 +77,7 @@ public class BuildingService {
                 log.warn("Здание с ID: {} не найдено.", id);
                 return new EntityNotFoundException("Здание с ID " + id + " не найдено.");
             });
-        return buildingMapper.toBuildingResponse(building);  // Используем маппер
+        return buildingMapper.toBuildingResponse(building);
     }
 
     /**
