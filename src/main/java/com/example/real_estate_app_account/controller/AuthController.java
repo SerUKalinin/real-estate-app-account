@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Slf4j // Аннотация для логирования
+@Slf4j
 public class AuthController {
     private final AuthService authService;
 
