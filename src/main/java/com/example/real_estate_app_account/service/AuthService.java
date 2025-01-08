@@ -28,11 +28,8 @@ public class AuthService {
      * @param request DTO с данными для регистрации.
      */
     public void register(RegisterRequest request) {
-        log.info("Попытка регистрации пользователя с именем: {}", request.getUsername());
-
         if (userRepository.findByUsername(request.getUsername()).isPresent() ||
             userRepository.findByEmail(request.getEmail()).isPresent()) {
-            log.warn("Ошибка регистрации: имя пользователя или email уже существует.");
             throw new IllegalArgumentException("Имя пользователя или адрес электронной почты уже существуют.");
         }
 
@@ -44,7 +41,6 @@ public class AuthService {
         user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
-        log.info("Пользователь с именем '{}' успешно зарегистрирован.", request.getUsername());
     }
 
     /**
@@ -54,22 +50,14 @@ public class AuthService {
      * @return Токен авторизации.
      */
     public AuthResponse login(LoginRequest request) {
-        log.info("Попытка входа пользователя с именем: {}", request.getUsername());
-
         User user = userRepository.findByUsername(request.getUsername())
-            .orElseThrow(() -> {
-                log.warn("Ошибка входа: неверное имя пользователя или пароль.");
-                return new IllegalArgumentException("Неверное имя пользователя или пароль.");
-            });
+            .orElseThrow(() -> new IllegalArgumentException("Неверное имя пользователя или пароль."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            log.warn("Ошибка входа: неверный пароль для пользователя '{}'.", request.getUsername());
             throw new IllegalArgumentException("Неверное имя пользователя или пароль.");
         }
 
         String token = jwtUtil.generateToken(user.getUsername());
-        log.info("Пользователь '{}' успешно авторизован. Токен сгенерирован.", request.getUsername());
-
         return new AuthResponse(token);
     }
 }
