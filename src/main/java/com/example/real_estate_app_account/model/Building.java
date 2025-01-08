@@ -15,19 +15,20 @@ import java.util.List;
 @Data
 @Entity
 public class Building {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;  // Идентификатор здания
 
-    private String name; // Например, "Жилой комплекс 1"
+    private String name;  // Название здания, например, "Жилой комплекс 1"
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", nullable = false)
-    private Address address; // Адрес здания
+    @ManyToOne(cascade = CascadeType.ALL)  // Связь с сущностью Address (многие к одному)
+    @JoinColumn(name = "address_id", nullable = false)  // Столбец для хранения внешнего ключа на Address
+    private Address address;  // Адрес здания
 
-    @OneToMany(mappedBy = "building")
-    private List<Floor> floors; // Этажи в здании
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL)  // Связь с сущностью Floor (один ко многим)
+    private List<Floor> floors;  // Список этажей в здании
 
-    @OneToMany(mappedBy = "building")
-    private List<Entrance> entrances; // Подъезды в здании
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL)  // Связь с сущностью Entrance (один ко многим)
+    private List<Entrance> entrances;  // Список подъездов в здании
 }

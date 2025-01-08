@@ -28,7 +28,8 @@ public class SecurityConfig {
         http.csrf().disable()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/buildings", "/api/buildings/{id}").hasRole("USER") // Доступ только для пользователей с ролью ROLE_USER
+                .requestMatchers(HttpMethod.GET, "/api/buildings", "/api/buildings/{id}").hasRole("USER")
+                .requestMatchers("/api/entrances/**").hasRole("USER")// Доступ только для пользователей с ролью ROLE_USER
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
