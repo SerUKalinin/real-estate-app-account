@@ -6,20 +6,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
-public class Elevator {
+@Getter
+@Setter
+public class Lobby {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String lobbyName;
 
     @ManyToOne
-    @JoinColumn(name = "entrance_id", nullable = false)
+    @JoinColumn(name = "elevator_id")
+    private Elevator elevator;
+
+    @ManyToOne
+    @JoinColumn(name = "entrance_id")
     private Entrance entrance;
 
     private Integer floor;
@@ -27,5 +33,4 @@ public class Elevator {
     @ManyToOne
     @JoinColumn(name = "building_id")
     private Building building;
-
 }
