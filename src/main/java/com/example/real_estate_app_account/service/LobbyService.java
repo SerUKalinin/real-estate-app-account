@@ -5,6 +5,7 @@ import com.example.real_estate_app_account.dto.LobbyResponse;
 import com.example.real_estate_app_account.exception.BuildingNotFoundException;
 import com.example.real_estate_app_account.exception.EntranceNotFoundException;
 import com.example.real_estate_app_account.exception.ElevatorNotFoundException;
+import com.example.real_estate_app_account.mapper.LobbyMapper;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.model.Elevator;
@@ -29,6 +30,7 @@ public class LobbyService {
     private final ElevatorRepository elevatorRepository;
     private final EntranceRepository entranceRepository;
     private final BuildingRepository buildingRepository;
+    private final LobbyMapper lobbyMapper;
 
     public LobbyResponse createLobby(LobbyRequest request) {
         log.info("Попытка создания лифтового холла: {}", request);
@@ -60,14 +62,14 @@ public class LobbyService {
 
         Lobby savedLobby = lobbyRepository.save(lobby);
         log.info("Лифтовый холл с ID {} успешно создан", savedLobby.getId());
-        return mapToResponse(savedLobby);
+        return lobbyMapper.toLobbyResponse(savedLobby);
     }
 
     public List<LobbyResponse> getAllLobbies() {
         log.info("Запрос списка всех лифтовых холлов");
         List<LobbyResponse> responses = lobbyRepository.findAll()
             .stream()
-            .map(this::mapToResponse)
+            .map(lobbyMapper::toLobbyResponse)
             .collect(Collectors.toList());
         log.info("Найдено {} лифтовых холлов", responses.size());
         return responses;
@@ -81,7 +83,7 @@ public class LobbyService {
                 return new RuntimeException("Лифтовый холл с ID " + id + " не найден");
             });
         log.info("Лифтовый холл с ID {} найден", id);
-        return mapToResponse(lobby);
+        return lobbyMapper.toLobbyResponse(lobby);
     }
 
     public LobbyResponse updateLobby(Long id, LobbyRequest request) {
@@ -119,7 +121,7 @@ public class LobbyService {
 
         Lobby updatedLobby = lobbyRepository.save(lobby);
         log.info("Лифтовый холл с ID {} успешно обновлён", updatedLobby.getId());
-        return mapToResponse(updatedLobby);
+        return lobbyMapper.toLobbyResponse(updatedLobby);
     }
 
     public void deleteLobby(Long id) {
@@ -130,16 +132,5 @@ public class LobbyService {
         }
         lobbyRepository.deleteById(id);
         log.info("Лифтовый холл с ID {} успешно удалён", id);
-    }
-
-    private LobbyResponse mapToResponse(Lobby lobby) {
-        LobbyResponse response = new LobbyResponse();
-        response.setId(lobby.getId());
-        response.setLobbyName(lobby.getLobbyName());
-        response.setElevatorId(lobby.getElevator().getId());
-        response.setEntranceId(lobby.getEntrance().getId());
-        response.setFloor(lobby.getFloor());
-        response.setBuildingId(lobby.getBuilding().getId());
-        return response;
     }
 }
