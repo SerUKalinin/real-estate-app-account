@@ -25,11 +25,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("Настройка безопасности: отключение CSRF и разрешение публичного доступа к /api/auth/**");
+
         http.csrf().disable()
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()  // Разрешение доступа к логину без токена
                 .requestMatchers(HttpMethod.GET, "/api/buildings", "/api/buildings/{id}").hasRole("USER")
                 .requestMatchers("/api/entrances/**").hasRole("USER")
+                .requestMatchers("/swagger-ui/**", "/v2/api-docs", "/swagger-resources/**", "/webjars/**").permitAll()
                 .requestMatchers("/api/elevators/**").hasRole("USER")
                 .requestMatchers("/api/floors**").hasRole("USER")
                 .anyRequest().authenticated()
@@ -39,6 +41,8 @@ public class SecurityConfig {
         log.info("Безопасность настроена: фильтр JWT добавлен.");
         return http.build();
     }
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
