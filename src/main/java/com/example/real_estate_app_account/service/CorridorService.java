@@ -4,6 +4,7 @@ import com.example.real_estate_app_account.dto.CorridorRequest;
 import com.example.real_estate_app_account.dto.CorridorResponse;
 import com.example.real_estate_app_account.exception.BuildingNotFoundException;
 import com.example.real_estate_app_account.exception.FloorNotFoundException;
+import com.example.real_estate_app_account.mapper.CorridorMapper;
 import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Corridor;
 import com.example.real_estate_app_account.model.Floor;
@@ -25,6 +26,8 @@ public class CorridorService {
     private final CorridorRepository corridorRepository;
     private final FloorRepository floorRepository;
     private final BuildingRepository buildingRepository;
+    private final CorridorMapper corridorMapper;
+
 
     /**
      * Создание нового коридора.
@@ -41,20 +44,12 @@ public class CorridorService {
                 return new FloorNotFoundException("Этаж с ID " + request.getFloorId() + " не найден");
             });
 
-        Building building = buildingRepository.findById(request.getBuildingId())
-            .orElseThrow(() -> {
-                log.error("Здание с ID {} не найдено", request.getBuildingId());
-                return new BuildingNotFoundException("Здание с ID " + request.getBuildingId() + " не найдено");
-            });
-
-        Corridor corridor = new Corridor();
-        corridor.setName(request.getName());
+        Corridor corridor = corridorMapper.toEntity(request);
         corridor.setFloor(floor);
-        corridor.setBuilding(building);
 
         Corridor savedCorridor = corridorRepository.save(corridor);
         log.info("Коридор с ID {} успешно создан", savedCorridor.getId());
-        return mapToResponse(savedCorridor);
+        return corridorMapper.toResponse(savedCorridor);
     }
 
     /**
@@ -67,7 +62,7 @@ public class CorridorService {
 
         List<CorridorResponse> responses = corridorRepository.findAll()
             .stream()
-            .map(this::mapToResponse)
+            .map(corridorMapper::toResponse)
             .collect(Collectors.toList());
 
         log.info("Найдено {} коридоров", responses.size());
@@ -91,7 +86,7 @@ public class CorridorService {
             });
 
         log.info("Коридор с ID {} найден", id);
-        return mapToResponse(corridor);
+        return corridorMapper.toResponse(corridor);
     }
 
     /**
@@ -129,7 +124,7 @@ public class CorridorService {
 
         Corridor updatedCorridor = corridorRepository.save(corridor);
         log.info("Коридор с ID {} успешно обновлён", updatedCorridor.getId());
-        return mapToResponse(updatedCorridor);
+        return corridorMapper.toResponse(updatedCorridor);
     }
 
     /**
@@ -142,20 +137,5 @@ public class CorridorService {
 
         corridorRepository.deleteById(id);
         log.info("Коридор с ID {} успешно удалён", id);
-    }
-
-    /**
-     * Преобразование сущности коридора в DTO.
-     *
-     * @param corridor Сущность коридора.
-     * @return DTO с данными коридора.
-     */
-    private CorridorResponse mapToResponse(Corridor corridor) {
-        CorridorResponse response = new CorridorResponse();
-        response.setId(corridor.getId());
-        response.setName(corridor.getName());
-        response.setFloorId(corridor.getFloor().getId());
-        response.setBuildingId(corridor.getBuilding().getId());
-        return response;
     }
 }
