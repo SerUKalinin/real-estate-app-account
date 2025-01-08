@@ -7,4 +7,5 @@ public class ElevatorRequest {
     private String name; // Название лифта
     private Long entranceId; // ID подъезда
     private Integer floor; // Этаж
+    private Long buildingId;
 }

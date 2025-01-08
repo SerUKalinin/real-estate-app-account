@@ -4,6 +4,7 @@ import com.example.real_estate_app_account.dto.ElevatorRequest;
 import com.example.real_estate_app_account.dto.ElevatorResponse;
 import com.example.real_estate_app_account.exception.EntranceNotFoundException;
 import com.example.real_estate_app_account.exception.ElevatorNotFoundException;
+import com.example.real_estate_app_account.model.Building;
 import com.example.real_estate_app_account.model.Entrance;
 import com.example.real_estate_app_account.model.Elevator;
 import com.example.real_estate_app_account.repository.EntranceRepository;
@@ -38,10 +39,18 @@ public class ElevatorService {
                 return new EntranceNotFoundException("Подъезд с ID " + request.getEntranceId() + " не найден");
             });
 
+        // Получение здания через подъезд
+        Building building = entrance.getBuilding();
+        if (building == null) {
+            log.error("Подъезд с ID {} не привязан к зданию", request.getEntranceId());
+            throw new RuntimeException("Подъезд с ID " + request.getEntranceId() + " не привязан к зданию");
+        }
+
         Elevator elevator = new Elevator();
         elevator.setName(request.getName());
         elevator.setEntrance(entrance);
         elevator.setFloor(request.getFloor());
+        elevator.setBuilding(building);
 
         Elevator savedElevator = elevatorRepository.save(elevator);
         log.info("Лифт с ID {} успешно создан", savedElevator.getId());
