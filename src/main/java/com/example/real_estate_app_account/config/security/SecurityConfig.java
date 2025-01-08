@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/buildings", "/api/buildings/{id}").hasRole("USER")
                 .requestMatchers("/api/entrances/**").hasRole("USER")
                 .requestMatchers("/swagger-ui/**", "/v2/api-docs", "/swagger-resources/**", "/webjars/**").permitAll()
+                .requestMatchers("/api/elevators/**").hasRole("USER")
+                .requestMatchers("/api/floors**").hasRole("USER")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

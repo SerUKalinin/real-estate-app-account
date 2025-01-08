@@ -18,11 +18,19 @@ public class Apartment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // Идентификатор квартиры
+    private Long id;
 
-    private String apartmentNumber;  // Номер квартиры
+    private String name;
+
+    private Integer number;
 
     @ManyToOne
-    @JoinColumn(name = "floor_id", nullable = false)  // Связь с сущностью Floor
-    private Floor floor;  // Этаж, на котором находится квартира
+    @JoinColumn(name = "floor_id", nullable = false)
+    private Floor floor;
+
+    @ManyToOne
+    @JoinColumn(name = "building_id", nullable = false)
+    private Building building;
+
+    private Double area; // Площадь квартиры
 }

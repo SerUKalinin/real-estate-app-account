@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Использует Spring Data JPA для выполнения операций с базой данных.
  */
 public interface BuildingRepository extends JpaRepository<Building, Long> {
+    boolean existsByName(String name);
+
 }
