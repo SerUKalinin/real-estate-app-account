@@ -1,6 +1,6 @@
 package com.example.real_estate_app_account.service.security;
 
-import com.example.real_estate_app_account.entity.User;
+import com.example.real_estate_app_account.model.User;
 import com.example.real_estate_app_account.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
