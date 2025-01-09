@@ -23,3 +23,9 @@ logging:
   level:
     org.springframework.web: INFO
     com.example: DEBUG
+springdoc:
+  api-docs:
+    enabled: true # Включение генерации OpenAPI JSON
+  swagger-ui:
+    enabled: true # Включение Swagger UI
+    path: /swagger-ui.html
